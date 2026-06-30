@@ -42,11 +42,9 @@ npm run start
 ### Environment variables
 Secrets are **not** committed to this repo. Create `cruzy-nextjs/.env.local` from `.env.example` and fill in the real values (ask the project owner for these):
 
-**Salesforce**
-- `SF_USERNAME`, `SF_PASSWORD`
-- `SF_CLIENT_ID`, `SF_CLIENT_SECRET`
-- `SF_INSTANCE_URL`, `SF_LOGIN_URL`
-- `SF_ACCESS_TOKEN`
+**Salesforce** (OAuth client-credentials — see `cruzy-nextjs/SALESFORCE_AUTH.md`)
+- `SF_CLIENT_ID`, `SF_CLIENT_SECRET`, `SF_INSTANCE_URL`
+- `SF_ACCESS_TOKEN` — optional, local-dev only (static CLI token)
 
 **Authorize.net (payments)**
 - `AUTHNET_API_LOGIN_ID`, `AUTHNET_TRANSACTION_KEY` (server-side)
@@ -63,9 +61,3 @@ Secrets are **not** committed to this repo. Create `cruzy-nextjs/.env.local` fro
 
 ## Tracking / analytics
 The marketing site already includes Google tracking (`gtag`). To track the **full funnel** (marketing site → portal signup/payment), install the same analytics/GTM container on the portal too, enable cross-domain tracking, and fire conversion events on signup and successful payment.
-# cruzyv2
-# cruzyv2
-# cruzyv2
-# cruzyv2
-# cruzyv2
-# cruzyv2
