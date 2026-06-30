@@ -4,6 +4,8 @@ import { generateResetToken, getResetExpiry } from '@/lib/auth'
 import { sendEmail, resetPasswordEmail } from '@/lib/email'
 
 export async function POST(req: NextRequest) {
+  const genericMessage = 'If that email is on file, a reset link is on its way.'
+
   try {
     const { email } = await req.json()
 
@@ -13,10 +15,7 @@ export async function POST(req: NextRequest) {
 
     // Generic response used for every "not eligible" case, so the form never
     // reveals whether an email exists or has a membership (anti-enumeration).
-    const generic = NextResponse.json({
-      success: true,
-      message: 'If that email is on file, a reset link is on its way.',
-    })
+    const generic = NextResponse.json({ success: true, message: genericMessage })
 
     const contact = await findContactByEmail(email.toLowerCase().trim())
     if (!contact || contact.Portal_Status__c === 'Inactive') {
@@ -40,11 +39,17 @@ export async function POST(req: NextRequest) {
     const resetUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/reset-password?token=${token}`
 
     // Email the "click to reset password" link to the member.
-    await sendEmail({
-      to: contact.Email,
-      subject: 'Reset your Cruzy password',
-      html: resetPasswordEmail(contact.FirstName, resetUrl),
-    })
+    try {
+      await sendEmail({
+        to: contact.Email,
+        subject: 'Reset your Cruzy password',
+        html: resetPasswordEmail(contact.FirstName, resetUrl),
+      })
+    } catch (mailErr) {
+      // Keep the response generic for users even if SMTP is temporarily broken.
+      console.error('Forgot password email send error:', mailErr)
+      return generic
+    }
 
     return NextResponse.json({
       success: true,
@@ -54,6 +59,6 @@ export async function POST(req: NextRequest) {
     })
   } catch (err) {
     console.error('Forgot password error:', err)
-    return NextResponse.json({ success: false, error: 'An unexpected error occurred' }, { status: 500 })
+    return NextResponse.json({ success: true, message: genericMessage })
   }
 }

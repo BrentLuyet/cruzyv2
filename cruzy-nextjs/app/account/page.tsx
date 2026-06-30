@@ -217,7 +217,7 @@ export default function AccountPage() {
   if (loading) {
     return (
       <div style={{ background: '#f5f7fa', minHeight: '100vh', fontFamily: 'Poppins, sans-serif' }}>
-        <SiteHeader />
+        <SiteHeader bookYourCruiseHref="/api/account/auto-booking-launcher" bookYourCruiseTarget="_blank" />
         <div className="flex items-center justify-center" style={{ minHeight: '60vh' }}>
           <div style={{ textAlign: 'center', color: '#767676' }}>
             <div style={{ width: '48px', height: '48px', border: '4px solid #dde3ec', borderTopColor: '#10559a', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px' }} />
@@ -232,7 +232,7 @@ export default function AccountPage() {
   if (error) {
     return (
       <div style={{ background: '#f5f7fa', minHeight: '100vh', fontFamily: 'Poppins, sans-serif' }}>
-        <SiteHeader />
+        <SiteHeader bookYourCruiseHref="/api/account/auto-booking-launcher" bookYourCruiseTarget="_blank" />
         <div className="flex items-center justify-center" style={{ minHeight: '60vh' }}>
           <div style={{ textAlign: 'center', color: '#bd1f34' }}>{error}</div>
         </div>
@@ -258,7 +258,7 @@ export default function AccountPage() {
 
   return (
     <div style={{ background: '#f5f7fa', minHeight: '100vh', fontFamily: 'Poppins, sans-serif' }}>
-      <SiteHeader />
+      <SiteHeader bookYourCruiseHref="/api/account/auto-booking-launcher" bookYourCruiseTarget="_blank" />
 
       {/* Hero banner */}
       <div style={{ background: '#10559a', color: '#fff', padding: '40px 0 0' }}>

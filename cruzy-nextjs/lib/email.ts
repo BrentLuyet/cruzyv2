@@ -9,24 +9,28 @@ export async function sendEmail(opts: {
   subject: string
   html: string
 }): Promise<{ sent: boolean }> {
-  const host = process.env.SMTP_HOST
+  const host = process.env.SMTP_HOST || process.env.MAIL_HOST
   if (!host) {
     console.log(`[email skipped — SMTP not configured] to=${opts.to} subject="${opts.subject}"`)
     return { sent: false }
   }
 
-  const port = Number(process.env.SMTP_PORT || 587)
+  const port = Number(process.env.SMTP_PORT || process.env.MAIL_PORT || 587)
+  const smtpUser = process.env.SMTP_USER || process.env.MAIL_USERNAME
+  const smtpPass = process.env.SMTP_PASS || process.env.MAIL_PASSWORD
+  const smtpFrom = process.env.SMTP_FROM || process.env.MAIL_FROM || smtpUser || 'no-reply@cruzy.com'
+
   const transporter = nodemailer.createTransport({
     host,
     port,
     secure: port === 465, // SSL on 465, STARTTLS otherwise
-    auth: process.env.SMTP_USER
-      ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+    auth: smtpUser
+      ? { user: smtpUser, pass: smtpPass }
       : undefined,
   })
 
   await transporter.sendMail({
-    from: process.env.SMTP_FROM || process.env.SMTP_USER || 'no-reply@cruzy.com',
+    from: smtpFrom,
     to: opts.to,
     subject: opts.subject,
     html: opts.html,

@@ -1,8 +1,17 @@
 'use client'
 
-export default function SiteHeader() {
-  const portalHome = 'https://cruzyv2.luyetcompanies.com'
+interface SiteHeaderProps {
+  bookYourCruiseHref?: string
+  bookYourCruiseTarget?: '_self' | '_blank'
+}
+
+export default function SiteHeader({ bookYourCruiseHref, bookYourCruiseTarget }: SiteHeaderProps = {}) {
+  const portalHome = 'https://portal.cruzyv2.luyetcompanies.com'
   const portalLogin = 'https://portal.cruzyv2.luyetcompanies.com/login'
+  const bookingHref = bookYourCruiseHref || portalLogin
+  const defaultTarget: '_blank' | '_self' = bookYourCruiseHref ? (/^https?:\/\//i.test(bookingHref) ? '_blank' : '_self') : '_self'
+  const bookingTarget = bookYourCruiseTarget || defaultTarget
+  const bookingRel = bookingTarget === '_blank' ? 'noopener noreferrer' : undefined
 
   return (
     <header style={{ background: '#10559a' }} className="w-full">
@@ -50,10 +59,10 @@ export default function SiteHeader() {
           </a>
           {/* Book Your Cruise — red button */}
           <a
-            href="https://cruzy.com/book"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hidden xl:flex flex-col items-center justify-center text-white font-bold text-center leading-tight px-8 self-stretch"
+            href={bookingHref}
+            target={bookingTarget}
+            rel={bookingRel}
+            className="flex flex-col items-center justify-center text-white font-bold text-center leading-tight px-4 md:px-6 lg:px-8 self-stretch"
             style={{ background: '#bd1f34', fontSize: '15px', fontFamily: 'Poppins, sans-serif', minWidth: '120px' }}
           >
             <span>Book Your</span>
@@ -62,7 +71,7 @@ export default function SiteHeader() {
           {/* Join Cruzy+ — navy button */}
           <a
             href={portalHome}
-            className="hidden xl:flex flex-col items-center justify-center text-white font-bold text-center leading-tight px-8 self-stretch"
+            className="hidden lg:flex flex-col items-center justify-center text-white font-bold text-center leading-tight px-6 lg:px-8 self-stretch"
             style={{ background: '#10559a', fontSize: '15px', fontFamily: 'Poppins, sans-serif', minWidth: '100px', borderLeft: '2px solid rgba(255,255,255,0.2)' }}
           >
             <span>Join</span>

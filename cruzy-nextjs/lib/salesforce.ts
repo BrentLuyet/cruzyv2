@@ -143,13 +143,37 @@ export async function pushToSalesforce(payload: ContactPayload): Promise<Salesfo
     MailingCountry: payload.country,
     Spouse_Significant_Other__c: spouseName || '',
     Cruzy_Plus_Enrolled__c: true,
-    Stripe_Customer_ID__c: payload.authnetCustomerProfileId,
-    Stripe_Payment_Intent_ID__c: payload.authnetTransactionId,
-    Stripe_Payment_Method_ID__c: payload.authnetPaymentProfileId,
+    Authnet_Customer_Profile_ID__c: payload.authnetCustomerProfileId,
+    Authnet_Transaction_ID__c: payload.authnetTransactionId,
+    Authnet_Payment_Profile_ID__c: payload.authnetPaymentProfileId,
     Customer_Source__c: 'Website',
   }
 
-  const contactResult = await sfPost(access_token, instance_url, 'Contact', contactBody)
+  let contactResult: { id: string }
+  try {
+    contactResult = await sfPost(access_token, instance_url, 'Contact', contactBody)
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    // Some Salesforce profiles cannot write Mailing* fields. Retry with a
+    // reduced payload so signup can still create the Contact + Membership.
+    if (message.includes('INVALID_FIELD_FOR_INSERT_UPDATE')) {
+      const fallbackContactBody: Record<string, unknown> = {
+        FirstName: payload.firstName,
+        LastName: payload.lastName,
+        Email: payload.email,
+        Phone: payload.phone,
+        Spouse_Significant_Other__c: spouseName || '',
+        Cruzy_Plus_Enrolled__c: true,
+        Authnet_Customer_Profile_ID__c: payload.authnetCustomerProfileId,
+        Authnet_Transaction_ID__c: payload.authnetTransactionId,
+        Authnet_Payment_Profile_ID__c: payload.authnetPaymentProfileId,
+        Customer_Source__c: 'Website',
+      }
+      contactResult = await sfPost(access_token, instance_url, 'Contact', fallbackContactBody)
+    } else {
+      throw err
+    }
+  }
   const contactId = contactResult.id
 
   // ── 2. Generate Cruzy Member ID & Create Membership__c ─────────────────────
@@ -204,7 +228,7 @@ export async function pushToSalesforce(payload: ContactPayload): Promise<Salesfo
     Expiry_Year__c: payload.cardExpYear || null,
     Cardholder_Name__c: payload.nameOnCard,
     Is_Default__c: true,
-    Stripe_Payment_Method_Id__c: payload.authnetPaymentProfileId,
+    Authnet_Payment_Profile_Id__c: payload.authnetPaymentProfileId,
   }
 
   const savedCardResult = await sfPost(access_token, instance_url, 'Saved_Card__c', savedCardBody)
